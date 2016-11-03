@@ -13,15 +13,14 @@ module.exports = (grunt) ->
 
   # Please see the Grunt documentation for more information regarding task
   # creation: http://gruntjs.com/creating-tasks
-  grunt.registerTask 'svninfo','Get Subversion info from a working copy and populate grunt.config with the data', (output, argsKey) ->
+  grunt.registerMultiTask 'svninfo','Get Subversion info from a working copy and populate grunt.config with the data', () ->
     done = @async()
-    options = @options
-      cwd: '.'
-      output: 'svninfo'
-    options.output = output if output
-    args = options[argsKey or 'args']
+    options = @data.options
+    options.cwd = options.cwd or '.' 
+    options.output = options.output or @target or 'svninfo' 
+    args = options.args
     
-    grunt.verbose.writeln("svninfo start: output - ", options.output, ", args - ", args)
+    grunt.verbose.writeln("svninfo start: output: ", options.output, ", args: ", args, ", cwd: ", options.cwd)
     
     grunt.util.spawn
       cmd: 'svn'
@@ -54,5 +53,5 @@ module.exports = (grunt) ->
           root: repoRootRE.exec(result.stdout)[1]
           id: repoIdRE.exec(result.stdout)[1]
 
-      grunt.log.writeln "SVN info fetched (rev: #{grunt.config.get(options.output + '.rev')})"
+      grunt.log.writeln "SVN info fetched (last rev: #{grunt.config.get(options.output + '.last.rev')})"
       done()
